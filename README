@@ -1,0 +1,7 @@
+Depends on: node.js and socket.io
+
+npm install socket.io
+
+node server.js
+
+open index.html in chrome, edit test.js and style.css. page should update. timing is ... slow
