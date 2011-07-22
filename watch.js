@@ -16,6 +16,9 @@
       isOpera               = window.opera && toString.call( window.opera ) == '[object Opera]',
       isWebkit              = ( 'webkitAppearance' in docElement.style ),
       isNewerWebkit         = isWebkit && 'async' in doc.createElement('script'),
+      isArray               = Array.isArray || function (obj) {
+        return toString.call(obj) == '[object Array]';
+      },
       watch                 = {};      
       
       /* Loader helper functions */
@@ -169,6 +172,15 @@
         }
      }
   }
+
+  // _watch.js(['file.js', 'test.js'], function () {}, function () {});
+  function js(files, cleanup, reinit) {
+      //let's consistantly process files as an array
+      if ( ! isArray(files) ) {
+           files = [files];
+      }
+
+  }
   watch.loadCSS = injectCss;
   watch.loadJS = injectJs;
   watch.css = css;
@@ -204,10 +216,8 @@
     }
 
     /* TESTING */
-    //var testCSS = doc.getElementsByTagName('link')[0];
     var testJS = doc.getElementsByTagName('script')[2];
   	//start watching a file
-  	//socket.emit("watchfile", {name : "styles.css", location : testCSS.href, type : "css" });
     socket.emit("watchfile", {name : "test.js", location : testJS.src, type : "js" });
     watch.socket = socket;
   });
