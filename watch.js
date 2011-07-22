@@ -148,19 +148,26 @@
       }
     }
   }
-  
+ 
+  watch_queue = [];
   function css(selector) {
     var links, link, 
-        i;
+        i, props;
     if (selector === "*") {
       links = doc.getElementsByTagName('link');
         for(i = 0; i < links.length; i++) {
           link = links[i];
           if (link.rel === "stylesheet") {
-            watch.socket.emit("watchfile", {name : link.attributes.getNamedItem('href').nodeValue, location : link.href, type: "css"});
+            props =  {name : link.attributes.getNamedItem('href').nodeValue, location : link.href, type: "css"};
+            if('socket' in watch) {
+                watch.socket.emit("watchfile", props);
+            } else {
+                watch_queue.push(props);
+            }
+
           }
         }
-    }
+     }
   }
   watch.loadCSS = injectCss;
   watch.loadJS = injectJs;
@@ -190,11 +197,17 @@
   		})
   	});
 
+    //if we started watching any files while socket was
+    //setting up
+    for (var i = 0; i < watch_queue.length; i++) {
+        socket.emit("watchfile", watch_queue.pop());
+    }
+
     /* TESTING */
-    var testCSS = doc.getElementsByTagName('link')[0];
+    //var testCSS = doc.getElementsByTagName('link')[0];
     var testJS = doc.getElementsByTagName('script')[2];
   	//start watching a file
-  	socket.emit("watchfile", {name : "styles.css", location : testCSS.href, type : "css" });
+  	//socket.emit("watchfile", {name : "styles.css", location : testCSS.href, type : "css" });
     socket.emit("watchfile", {name : "test.js", location : testJS.src, type : "js" });
     watch.socket = socket;
   });
