@@ -15,7 +15,7 @@ io.sockets.on('connection', function(socket) {
         // if we got a file and it isn't already being watched
         if (data.name.length && !(data.name in watching) ) {
 
-            fs.watchFile(data.name, {interval: 100}, function(curr, prev) {
+            fs.watchFile(data.name, {interval: 50}, function(curr, prev) {
                 // send client notification of change if this file was modified and not just accessed
                 if (curr.mtime > prev.mtime) {
                     socket.emit("file changed", {file: curr, location: data.location, type : data.type});
