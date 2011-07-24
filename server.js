@@ -10,7 +10,7 @@ io.sockets.on('connection', function(socket) {
             if (data.name.length && !(data.name in watching) ) {
               fs.watchFile(data.name, {interval: 50}, function(curr, prev) {
                 if (curr.mtime > prev.mtime) {
-                  socket.emit("file changed", {file: curr, location: data.location, type : data.type});
+                  socket.emit("file changed", {file: curr, location: data.location, type : data.type, name: data.name});
                 }
               });
               
@@ -18,3 +18,4 @@ io.sockets.on('connection', function(socket) {
             }
         });
 });
+

@@ -3,22 +3,28 @@
 	<title>Testing</title>
 	<link rel="stylesheet" href="styles.css" type="text/css" media="screen" title="no title" charset="utf-8">
 	<script src="test.js" type="text/javascript" charset="utf-8"></script>
+	<script src="another.js" type="text/javascript" charset="utf-8"></script>
 	
 <script src="watch.js" type="text/javascript" charset="utf-8"></script>
-
 <script>
-//not really working since the socket is loaded async. need to fix.
 	_watch.css("*");
-
-    /*_watch.js(
-        "test.js", 
-        function () {
-            delete window.$TEST;
+    _watch.js(
+        ["test.js", "another.js"], 
+        function () { //cleanup
+			$TEST.info();
+			delete $TEST;
         },
-        function () {
-            test.init();
+        function () { //reinit
+			$TEST.info();
         }
-    );*/
+    );
+
+   /* _watch.js(
+		"another.js",
+		function () {
+			delete window.more;
+		}
+	);*/
             
 </script>
 

@@ -19,7 +19,8 @@
       isArray               = Array.isArray || function (obj) {
         return toString.call(obj) == '[object Array]';
       },
-      watch                 = {};      
+      watch                 = {},
+      eventHandler          = {};     
       
       /* Loader helper functions */
       function isFileReady ( readyState ) {
@@ -134,10 +135,14 @@
           // Inject CSS
           // only inject if there are no errors, and we didn't set the no inject flag ( oldObj.e )
           firstScript.parentNode.insertBefore( link, firstScript );
+          execWhenReady();
         }
  
   //delete an element that matches the src or href
-  function deleteElem(location, type, callback) {
+  function deleteElem(location, type, cleanup, callback) {
+    if (typeof cleanup === 'function') {
+      cleanup(type);
+    }
     var elements = (type === 'js' ? doc.getElementsByTagName('script') : doc.getElementsByTagName('link')),
         element,
         i, l = elements.length;
@@ -153,7 +158,7 @@
   }
  
   watch_queue = [];
-  function css(selector) {
+  function css(selector, cleanup, reinit) {
     var links, link, 
         i, props;
     if (selector === "*") {
@@ -162,29 +167,79 @@
           link = links[i];
           if (link.rel === "stylesheet") {
             props =  {name : link.attributes.getNamedItem('href').nodeValue, location : link.href, type: "css"};
-            if('socket' in watch) {
-                watch.socket.emit("watchfile", props);
-            } else {
-                watch_queue.push(props);
-            }
-
+            queue(props, cleanup, reinit);
           }
         }
      }
   }
+  
+  //add to queue
+  function queue(props, cleanup, reinit) {
+    if("socket" in watch) {
+      watch.socket.emit("watchfile", props);
+    } else {
+      watch_queue.push(props);
+    }
+ 
+    cleanup = cleanup || dummy;
+    reinit = reinit || dummy;
+    eventHandler[props["name"]] = {cleanup: cleanup, reinit: reinit}
+  }
 
   // _watch.js(['file.js', 'test.js'], function () {}, function () {});
+  String.prototype.endsWith = function(search) {
+    return this.match(search + "$");
+  }
+  
+  function getScriptsBySrc() {
+    var scripts = {},
+        i,
+        src,
+        scriptElems = doc.getElementsByTagName('script'),
+        len = scriptElems.length;
+        
+    for(i = 0; i < len; i++) {
+      src = scriptElems[i].attributes.getNamedItem('src');
+      if(src && 'nodeValue' in src) { 
+        scripts[src.nodeValue] = scriptElems[i];
+      }
+    }
+    return scripts;
+  }
+  function dummy(test) {
+    if(test) console.log(test);
+    else console.log('dummy');
+  }
   function js(files, cleanup, reinit) {
       //let's consistantly process files as an array
       if ( ! isArray(files) ) {
            files = [files];
       }
+      
+      
+      var len = files.length,
+          scripts = getScriptsBySrc(),
+          file, script,
+          i, props;
+      for(i = 0; i < len; i++) {
+        file = files[i];
+        for(script in scripts) {
+          if (script.endsWith(file)) {
+            // watch this file
+            cleanup = cleanup || dummy;
+            reinit = reinit || dummy;
+            props = { name: script, location: scripts[script].src, type: "js", cleanup: cleanup, reinit: reinit};
+            queue(props, cleanup, reinit);
+          }
+        }
+      }
 
   }
+  js("test.js", function() { console.log('cleaningup')}, function() { console.log('reinit');});
   watch.loadCSS = injectCss;
   watch.loadJS = injectJs;
   watch.css = css;
-  
+  watch.js = js;
   injectJs("http://localhost:7201/socket.io/socket.io.js", function() {
     console.log(watch)
     var socket = io.connect('http://localhost:7201');
@@ -194,16 +249,17 @@
       	console.log('news', data);
      	});
 
-  	socket.on('file changed', function (data) {
-  	  console.log(data);
-  		deleteElem(data.location, data.type, function() {
+  	socket.on('file changed', function (data) {  	  
+  		deleteElem(data.location, data.type,
+  		 eventHandler[data.name].cleanup,
+  		 function() {
   		  if (data.type === "css") {
   		    injectCss(data.location, function () {
-    		    console.log('refreshed');
+  		      eventHandler[data.name].reinit('test');
     		  });
   		  } else if (data.type === "js") {
   		    injectJs(data.location, function () {
-  		      console.log('refreshed');
+  		      eventHandler[data.name].reinit();
   		    })
   		  }
   		})
@@ -216,11 +272,11 @@
     }
 
     /* TESTING */
-    var testJS = doc.getElementsByTagName('script')[2];
+    //var testJS = doc.getElementsByTagName('script')[2];
   	//start watching a file
-    socket.emit("watchfile", {name : "test.js", location : testJS.src, type : "js" });
+    //socket.emit("watchfile", {name : "test.js", location : testJS.src, type : "js" });
     watch.socket = socket;
   });
-  
+  watch.event_handler = eventHandler;
   window._watch = watch;
 })(this, this.document);
