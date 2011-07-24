@@ -19,8 +19,11 @@
       isArray               = Array.isArray || function (obj) {
         return toString.call(obj) == '[object Array]';
       },
+      dummyFn               = function () {},
       watch                 = {},
-      eventHandler          = {};     
+      watch_queue           = [],
+      eventHandler          = {},
+      socket;     
       
       /* Loader helper functions */
       function isFileReady ( readyState ) {
@@ -156,8 +159,14 @@
       }
     }
   }
- 
-  watch_queue = [];
+   
+  /*
+    external API call for css, currently only supports *
+
+    ex:
+    _watch.css("*");
+    _watch.css("*", function() { //cleanup }, function() { //reinit })
+  */
   function css(selector, cleanup, reinit) {
     var links, link, 
         i, props;
@@ -166,7 +175,6 @@
         for(i = 0; i < links.length; i++) {
           link = links[i];
           if (link.rel === "stylesheet") {
-            console.log(link.href)
             props =  {name : link.attributes.getNamedItem('href').nodeValue, location : link.href, type: "css"};
             queue(props, cleanup, reinit);
           }
@@ -174,23 +182,57 @@
      }
   }
   
-  //add to queue
+  /*
+    external API call for js
+    
+    ex: 
+    _watch.js("test.js");
+    _watch.js("test.js", function() { //cleanup }, function() { //reinit });
+  */
+  function js(selector, cleanup, reinit) {
+      //let's consistantly process files as an array
+      if ( ! isArray(selector) ) {
+           selector = [selector];
+      }
+      
+      
+      var len = selector.length,
+          scripts = getScriptsBySrc(),
+          file, script,
+          i, props;
+      for(i = 0; i < len; i++) {
+        file = selector[i];
+        for(script in scripts) {
+          if (script.endsWith(file)) {
+            // watch this file
+            cleanup = cleanup || dummyFn;
+            reinit = reinit || dummyFn;
+            props = { name: script, location: scripts[script].src, type: "js", cleanup: cleanup, reinit: reinit};
+            queue(props, cleanup, reinit);
+          }
+        }
+      }
+
+  }
+  
+  //add to global queue or process if socket is open
   function queue(props, cleanup, reinit) {
     if("socket" in watch) {
-      watch.socket.emit("watchfile", props);
+      socket.emit("watchfile", props);
     } else {
       watch_queue.push(props);
     }
-    cleanup = cleanup || dummy;
-    reinit = reinit || dummy;
+    cleanup = cleanup || dummyFn;
+    reinit = reinit || dummyFn;
     eventHandler[props["name"]] = {cleanup: cleanup, reinit: reinit}
   }
 
-  // _watch.js(['file.js', 'test.js'], function () {}, function () {});
+  //helper so we can refer to /files/js/test.js as test.js
   String.prototype.endsWith = function(search) {
     return this.match(search + "$");
   }
   
+  //returns a assoc array of scrps that have an external src
   function getScriptsBySrc() {
     var scripts = {},
         i,
@@ -206,47 +248,9 @@
     }
     return scripts;
   }
-  function dummy(test) {
-    if(test) console.log(test);
-    else console.log('dummy');
-  }
-  function js(files, cleanup, reinit) {
-      //let's consistantly process files as an array
-      if ( ! isArray(files) ) {
-           files = [files];
-      }
-      
-      
-      var len = files.length,
-          scripts = getScriptsBySrc(),
-          file, script,
-          i, props;
-      for(i = 0; i < len; i++) {
-        file = files[i];
-        for(script in scripts) {
-          if (script.endsWith(file)) {
-            // watch this file
-            cleanup = cleanup || dummy;
-            reinit = reinit || dummy;
-            props = { name: script, location: scripts[script].src, type: "js", cleanup: cleanup, reinit: reinit};
-            queue(props, cleanup, reinit);
-          }
-        }
-      }
 
-  }
-  watch.loadCSS = injectCss;
-  watch.loadJS = injectJs;
-  watch.css = css;
-  watch.js = js;
   injectJs("http://localhost:7201/socket.io/socket.io.js", function() {
-    console.log(watch)
-    var socket = io.connect('http://localhost:7201');
-
-  	//sanity
-  	socket.on('news', function (data) {
-      	console.log('news', data);
-     	});
+    socket = io.connect('http://localhost:7201');
 
   	socket.on('file changed', function (data) {  	  
   		deleteElem(data.location, data.type,
@@ -264,16 +268,17 @@
   		})
   	});
 
-    //if we started watching any files while socket was
-    //setting up
-
-    
+    //if we started watching any files while socket was setting up    
     while(data = watch_queue.pop()) {
-      console.log('hi')
         socket.emit("watchfile", data);
-      }
-    watch.socket = socket;
+    }
   });
-  watch.event_handler = eventHandler;
+
+  //setup API
+  watch.css = css;
+  watch.js = js;
+  
+  //expose API globally
   window._watch = watch;
+  
 })(this, this.document);
