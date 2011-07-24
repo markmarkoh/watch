@@ -166,6 +166,7 @@
         for(i = 0; i < links.length; i++) {
           link = links[i];
           if (link.rel === "stylesheet") {
+            console.log(link.href)
             props =  {name : link.attributes.getNamedItem('href').nodeValue, location : link.href, type: "css"};
             queue(props, cleanup, reinit);
           }
@@ -180,7 +181,6 @@
     } else {
       watch_queue.push(props);
     }
- 
     cleanup = cleanup || dummy;
     reinit = reinit || dummy;
     eventHandler[props["name"]] = {cleanup: cleanup, reinit: reinit}
@@ -235,7 +235,6 @@
       }
 
   }
-  js("test.js", function() { console.log('cleaningup')}, function() { console.log('reinit');});
   watch.loadCSS = injectCss;
   watch.loadJS = injectJs;
   watch.css = css;
@@ -267,14 +266,12 @@
 
     //if we started watching any files while socket was
     //setting up
-    for (var i = 0; i < watch_queue.length; i++) {
-        socket.emit("watchfile", watch_queue.pop());
-    }
 
-    /* TESTING */
-    //var testJS = doc.getElementsByTagName('script')[2];
-  	//start watching a file
-    //socket.emit("watchfile", {name : "test.js", location : testJS.src, type : "js" });
+    
+    while(data = watch_queue.pop()) {
+      console.log('hi')
+        socket.emit("watchfile", data);
+      }
     watch.socket = socket;
   });
   watch.event_handler = eventHandler;

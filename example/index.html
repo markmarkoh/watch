@@ -9,7 +9,7 @@
 <script>
 	_watch.css("*");
     _watch.js(
-        ["test.js", "another.js"], 
+        "test.js", 
         function () { //cleanup
 			$TEST.info();
 			delete $TEST;
@@ -19,12 +19,15 @@
         }
     );
 
-   /* _watch.js(
+    _watch.js(
 		"another.js",
 		function () {
-			delete window.more;
+			console.log("cleaning up another.js");
+		},
+		function () {
+			console.log("reinit another.js");
 		}
-	);*/
+	);
             
 </script>
 
