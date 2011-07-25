@@ -1,0 +1,65 @@
+h1. Watch
+
+Watch is a script reloader. 
+
+h3. Updates
+
+Follow "@markmarkoh":http://twitter.com/markmarkoh for updates.
+
+h3. Dependencies
+
+The following needs to be installed to run watch:
+
+* "Node":http://nodejs.org/
+* "npm":https://github.com/isaacs/npm/
+
+Watch requires the following libraries, which should install automatically:
+
+* "Socket.io":https://github.com/learnboost/socket.io
+
+h2. Installation
+
+<pre>
+npm install watch
+</pre>
+
+h3. Alternative Installation (from source)
+
+<pre>
+git clone git@github.com:markmarkoh/watch.git wawtch
+cd watch
+npm install
+</pre>
+
+h2. Running Watch
+
+In the Terminal, change directory to the server root
+<pre>
+cd ~/programs/web/sample
+watch
+</pre>
+
+If everything is working, you should see a message like this:
+<pre>
+Staring Watch.js server...
+Watch.js server started on port 7202
+Add <script src="http://localhost:7202/watch.js"></script> to your HTML
+</pre>
+
+Add that script to the *bottom* of your HTML document.
+
+
+h3. Licence (GPL)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see "http://www.gnu.org/licenses/":http://www.gnu.org/licenses/.
