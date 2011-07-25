@@ -10,7 +10,9 @@ Watch all CSS files for changes and reload them:
 Watch 1 Javascript file for changes:
 <pre>&lt;script&gt;_watch.js("test.js");&lt;/script&gt;</pre>
 
-Watch 1 Javascript file for changes, run a <pre>cleanup</pre>, reload the script, then run <pre>reinit</pre>:
+In this next example, <code>test.js</code> is a custom library that leaks 2 variables into the global namespace. We'll pass watch a cleanup function to remove the global variables (optional), and then a reinitialize function to reinit the <code>test.js</code> library.
+
+Watch 1 Javascript file for changes, run a <code>cleanup</code>, reload the script, then run <code>reinit</code>:
 <pre>&lt;script&gt;
 _watch.js(
   "test.js",
