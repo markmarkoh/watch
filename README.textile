@@ -1,6 +1,28 @@
 h1. Watch
 
-Watch is a script reloader. 
+Watch is a script reloader.
+
+Examples:
+
+Watch all CSS files for changes and reload them:
+<pre>&lt;script&gt;_watch.css("*");&lt;/script&gt;</pre>
+
+Watch 1 Javascript file for changes:
+<pre>&lt;script&gt;_watch.js("test.js");&lt;/script&gt;</pre>
+
+Watch 1 Javascript file for changes, run a <pre>cleanup</pre>, reload the script, then run <pre>reinit</pre>:
+<pre>&lt;script&gt;
+_watch.js(
+  "test.js",
+  function () { //cleanup
+    delete window.testGlobal1;
+    delete window.testGlobal2;
+  },
+  function () { //reinit 
+    test.init(); 
+  }
+);
+;&lt;/script&gt;</pre>
 
 h3. Updates
 
@@ -26,7 +48,7 @@ npm install watch
 h3. Alternative Installation (from source)
 
 <pre>
-git clone git@github.com:markmarkoh/watch.git wawtch
+git clone git@github.com:markmarkoh/watch.git watch
 cd watch
 npm install
 </pre>
@@ -34,14 +56,12 @@ npm install
 h2. Running Watch
 
 In the Terminal, change directory to the server root
-<pre>
-cd ~/programs/web/sample
+<pre>cd ~/programs/web/sample
 watch
 </pre>
 
 If everything is working, you should see a message like this:
-<pre>
-Staring Watch.js server...
+<pre>Staring Watch.js server...
 Watch.js server started on port 7202
 Add <script src="http://localhost:7202/watch.js"></script> to your HTML
 </pre>
@@ -49,7 +69,7 @@ Add <script src="http://localhost:7202/watch.js"></script> to your HTML
 Add that script to the *bottom* of your HTML document.
 
 
-h3. Licence (GPL)
+h4. Licence (GPL)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
