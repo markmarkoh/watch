@@ -16,16 +16,17 @@ var port = exports.port = 7201,
 
           // if we got a file and it isn't already being watched
           if (data.name.length && !(data.name in watching) ) {
-              path.exists(data.name, function(exists) {
+             filename = data.name.split('?')[0]; 
+              path.exists(filename, function(exists) {
                 if (exists) {
-                  fs.watchFile(data.name, {interval: 50}, function(curr, prev) {
+                  fs.watchFile(filename, {interval: 50}, function(curr, prev) {
                     // send client notification of change if this file was modified and not just accessed
                     if (curr.mtime > prev.mtime) {
                       socket.emit("file changed", {file: curr, location: data.location, type : data.type, name: data.name});
                     }
                   });
                 } else {
-                  console.log(data.name, "can't find");
+                  console.log(filename, "can't find");
                 }
 
               });
