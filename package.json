@@ -1,5 +1,5 @@
 {
-    "name": "watch",
+    "name": "watch.js",
     "description": "A script and stylesheet reloader. Less browser refreshing.",
     "version": "0.0.1",
     "author": "Mark DiMarco (@markmarkoh)",

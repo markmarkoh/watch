@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-var app = require('../server');
+var app = require('../watch');
