@@ -66,7 +66,7 @@ watch
 If everything is working, you should see a message like this:
 <pre>Staring Watch.js server...
 Watch.js server started on port 7202
-Add <script src="http://localhost:7202/watch.js"></script> to your HTML
+Add &lt;script src="http://localhost:7202/watch.js"&gt;&lt;/script&gt; to your HTML
 </pre>
 
 Add that script to the *bottom* of your HTML document.
