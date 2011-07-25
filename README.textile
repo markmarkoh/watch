@@ -45,7 +45,7 @@ Watch requires the following libraries, which should install automatically:
 h2. Installation
 
 <pre>
-npm install watch
+npm install watch.js
 </pre>
 
 h3. Alternative Installation (from source)
