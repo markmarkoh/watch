@@ -6,15 +6,15 @@ Watch is a script reloader. Watch monitors local Javascript and CSS files for ch
 Examples:
 
 Watch all CSS files for changes and reload them:
-<code>&lt;script&gt;_watch.css("*");&lt;/script&gt;</code>
+<pre>&lt;script&gt;_watch.css("*");&lt;/script&gt;</pre>
 
 Watch 1 Javascript file for changes:
-<code>&lt;script&gt;_watch.js("test.js");&lt;/script&gt;</code>
+<pre>&lt;script&gt;_watch.js("test.js");&lt;/script&gt;</pre>
 
 In this next example, <code>test.js</code> is a custom library that leaks 2 variables into the global namespace. We'll pass watch a cleanup function to remove the global variables (optional), and then a reinitialize function to reinit the <code>test.js</code> library.
 
 Watch 1 Javascript file for changes, run a <code>cleanup</code>, reload the script, then run <code>reinit</code>:
-<code>&lt;script&gt;
+<pre>&lt;script&gt;
 _watch.js(
   "test.js",
   function () { //cleanup
@@ -25,7 +25,7 @@ _watch.js(
     test.init(); 
   }
 );
-&lt;/script&gt;</code>
+&lt;/script&gt;</pre>
 
 h3. Updates
 
