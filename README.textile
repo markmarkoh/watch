@@ -45,23 +45,28 @@ Watch requires the following libraries, which should install automatically:
 h2. Installation
 
 <pre>
-npm install watch.js
+npm install watch.js -g
 </pre>
+
+* "-g" switch is used to install globally. WatchJS provides an executable, so this is necessary.
 
 h3. Alternative Installation (from source)
 
 <pre>
 git clone git@github.com:markmarkoh/watch.git watch
 cd watch
-npm install
+npm install . -g
 </pre>
 
 h2. Running Watch
 
 In the Terminal, change directory to the server root
 <pre>cd ~/programs/web/sample
-watch
+watchjs
 </pre>
+
+Alternatively:
+<pre>watchjs path/to/static/resources</pre>
 
 If everything is working, you should see a message like this:
 <pre>Staring Watch.js server...
@@ -69,8 +74,7 @@ Watch.js server started on port 7202
 Add &lt;script src="http://localhost:7202/watch.js"&gt;&lt;/script&gt; to your HTML
 </pre>
 
-Add that script to the *bottom* of your HTML document.
-
+Add that script to the *bottom* of your HTML document. Refer to the 'Examples' above for making API calls. 
 
 h4. Licence (GPL)
 
