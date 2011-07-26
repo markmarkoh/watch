@@ -19,16 +19,17 @@ var init = exports.init = function(static_dir) {
           var filename  = data.name.split('?')[0], 
               location  = data.location, 
               type      = data.type, 
-              name      = data.name;
+              name      = data.name,
+              pathname  = path.resolve(static_dir, filename);
 
           // if we got a file and it isn't already being watched
           if (data.name.length && !(data.name in watching) ) {
               filename = data.name.split('?')[0]; 
               watching.push(data.name);
 
-              path.exists(static_dir + '/' + filename, function(exists) {
+              path.exists(pathname, function(exists) {
                 if (exists) {
-                  fs.watchFile(static_dir + '/' + filename, {interval: 50}, function(curr, prev) {
+                  fs.watchFile(pathname, {interval: 50}, function(curr, prev) {
                     // send client notification of change if this file was modified and not just accessed
                     if (curr.mtime > prev.mtime) {
                       console.log("altered", [filename,location,type]);
@@ -36,7 +37,7 @@ var init = exports.init = function(static_dir) {
                     }
                   });
                 } else {
-                  console.log(static_dir + '/' + filename, "can't find");
+                  console.log(pathname, "can't find");
                 }
 
               });
