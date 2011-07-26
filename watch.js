@@ -6,6 +6,9 @@ var port = exports.port = 7201,
     path = require("path"),
     http = require('http'),
     client = __dirname + '/lib/watch.client.js';
+
+var init = exports.init = function(static_dir) {
+  console.log('starting sockets app', static_dir);
   io.sockets.on('connection', function(socket) {
 
       // keep track of watched files
@@ -23,9 +26,9 @@ var port = exports.port = 7201,
               filename = data.name.split('?')[0]; 
               watching.push(data.name);
 
-              path.exists(filename, function(exists) {
+              path.exists(static_dir + '/' + filename, function(exists) {
                 if (exists) {
-                  fs.watchFile(filename, {interval: 50}, function(curr, prev) {
+                  fs.watchFile(static_dir + '/' + filename, {interval: 50}, function(curr, prev) {
                     // send client notification of change if this file was modified and not just accessed
                     if (curr.mtime > prev.mtime) {
                       console.log("altered", [filename,location,type]);
@@ -33,7 +36,7 @@ var port = exports.port = 7201,
                     }
                   });
                 } else {
-                  console.log(filename, "can't find");
+                  console.log(static_dir + '/' + filename, "can't find");
                 }
 
               });
@@ -43,6 +46,8 @@ var port = exports.port = 7201,
           }
       });
   });
+  return 'started';
+}
 
 String.prototype.endsWith = function(search) {
   return this.match(search + "$");
@@ -66,4 +71,6 @@ http.createServer(function (request, response) {
 console.info('Watch.js server started on port 7202');
 console.info('Add <script src="http://localhost:7202/watch.js"></script> to your HTML');
 
+//start
+//if(!module.parent) { init('.'); }
 
