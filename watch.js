@@ -13,16 +13,23 @@ var port = exports.port = 7201,
     
       // when the client gives us a file to watch add watch listener    
       socket.on('watchfile', function(data) {
+          var filename  = data.name.split('?')[0], 
+              location  = data.location, 
+              type      = data.type, 
+              name      = data.name;
 
           // if we got a file and it isn't already being watched
           if (data.name.length && !(data.name in watching) ) {
-             filename = data.name.split('?')[0]; 
+              filename = data.name.split('?')[0]; 
+              watching.push(data.name);
+
               path.exists(filename, function(exists) {
                 if (exists) {
                   fs.watchFile(filename, {interval: 50}, function(curr, prev) {
                     // send client notification of change if this file was modified and not just accessed
                     if (curr.mtime > prev.mtime) {
-                      socket.emit("file changed", {file: curr, location: data.location, type : data.type, name: data.name});
+                      console.log("altered", [filename,location,type]);
+                      socket.emit("file changed", {file: curr, location: location, type : type, name: name});
                     }
                   });
                 } else {

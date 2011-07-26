@@ -1,6 +1,1 @@
-body {-webkit-transition: border-radius .5s ease-in; -webkit-transition: border-width .3s ease-in; border: 5px solid rgba(222, 24, 24, 0.9); background-color: rgba(230, 47, 150, .10); border-radius: 100px;}
-div {padding:15px;}
-.cool {border-radius: 6px; border-width: 50px;}
-body {text-shadow: 3px 1px 1px #DFD; font-family: serif; font-size:22px; padding: 49px;margin-left: 3px;}
-hr {border-style: outset; width: 50%;}
-body{color: red;}
+body {border: 3px solid red;}
